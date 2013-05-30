@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+ <metadata>
+   <id>PdbTasks</id>
+   <version>{Version}</version>
+   <authors>Alik Kurdyukov</authors>
+   <owners>Alik Kurdyukov</owners>
+   <licenseUrl>https://github.com/akurdyukov/pdbtasks/blob/master/LICENSE-LGPLv3</licenseUrl>
+   <projectUrl>https://github.com/akurdyukov/pdbtasks</projectUrl>
+   <summary>MSBuild tasks for PDB operations</summary>
+   <description>Several tasks simplifying PDB file operation like SVN source indexing. Based on SK Genius work VSSourceIndexing (http://bit.ly/10BNSqC)</description>
+   <copyright>Copyright 2013</copyright>
+   <tags>pdb symbols msbuild</tags>    
+ </metadata>
+</package>

@@ -11,12 +11,13 @@ Installation
 
 Requirement
 -----------
-- [Debugging Tools for Windows](http://msdn.microsoft.com/en-us/library/windows/hardware/ff551063(v=vs.85).aspx)
+- [Debugging Tools for Windows](http://msdn.microsoft.com/en-us/library/windows/hardware/ff551063\(v=vs.85\).aspx)
 - Command-line SVN client
 
 Example usage
 -------------
 You may include following code into your csproj
+
 	<Import Project="..\packages\PdbTasks.1.0\tools\PdbTasks.targets" />
 	<ItemGroup>
 		<PdbFile Include="$(OutputPath)\$(AssemblyName).pdb"/>
@@ -61,3 +62,19 @@ Task: PdbUploadToSymbolServer
 - **Version** - version for symbol server
 - **Comment** - comment for symbol server
 - **DebugToolsPath** - Debugging Tools for Windows installation path
+
+LICENSE
+=======
+
+PdbTasks is available under the GNU LGPL version 3 or later, or - at your option -
+the GNU GPL version 3 or later.
+
+See [Licensing FAQ](http://eigen.tuxfamily.org/index.php?title=Licensing_FAQ&oldid=1116) for a
+good description of what that means.
+
+AUTHORS
+=======
+
+PdbTasks was mainly written and is maintained by Alik Kurdyukov <akurdyukov@gmail.com>.
+
+Portions of code by SK Genius (http://www.codeproject.com/Members/SK-Genius).
