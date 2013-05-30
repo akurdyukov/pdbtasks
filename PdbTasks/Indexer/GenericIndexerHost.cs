@@ -82,7 +82,7 @@ namespace PdbTasks.Indexer
                     }
                     _fileCommands.Add(filePath, args);
 
-                    _logger.LogMessage("Adding file {0} with args {1}", filePath, args);
+                    _logger.LogMessage("Adding file {0}", filePath);
                 }
             }
         }
@@ -301,7 +301,7 @@ namespace PdbTasks.Indexer
                 if (fi.Directory == null || fi.DirectoryName == null)
                     continue;
 
-                if (fi.FullName.StartsWith(SolutionDirectory))
+                if (fi.FullName.StartsWith(SolutionDirectory, true, CultureInfo.InvariantCulture))
                     kvp.Value["CachePath"] = fi.DirectoryName.Substring(SolutionDirectory.Length + 1);
                 else
                 {

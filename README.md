@@ -27,10 +27,10 @@ You may include following code into your csproj
 		<SymbolFiles Include="$(OutputPath)\*.exe"/>
 		<SymbolFiles Include="$(OutputPath)\*.dll"/>
 	</ItemGroup>
-	<Target Name="AfterBuild">
-		<PdbIndexFromSvn SourcePdb="@(PdbFile)" SourceDirectory="." Condition="$(SymbolServer) != ''"/>
-		<PdbUploadToSymbolServer Files="@(SymbolFiles)" SymbolServer="$(SymbolServer)" Condition="$(SymbolServer) != ''"/>
-	</Target>
+    <Target Name="AfterBuild">
+        <PdbIndexFromSvn SourcePdb="@(PdbFile)" SourceDirectory="$(MSBuildProjectDirectory)" Condition="$(SymbolServer) != ''"/>
+        <PdbUploadToSymbolServer Files="@(SymbolFiles)" SymbolServer="$(SymbolServer)" Condition="$(SymbolServer) != ''"/>
+    </Target>
 
 Now you can build your project in regular manner to debug locally or add build property `SymbolServer` to instrument your pdb and upload artifacts to symbol server.
 
