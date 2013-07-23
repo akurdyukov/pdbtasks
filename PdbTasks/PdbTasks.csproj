@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DebuggingToolsForWindows.cs" />
     <Compile Include="Indexer\CommandArgs.cs" />
     <Compile Include="Indexer\FileCommands.cs" />
     <Compile Include="Indexer\FileStatus.cs" />
