@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using Microsoft.Build.Utilities;
@@ -13,14 +14,13 @@ namespace PdbTasks.Indexer
         private readonly FileCommands _fileCommands;
         private readonly List<string> _allowedArgs;
         private readonly List<LocalFile> _localFiles;
+        private readonly DebuggingToolsForWindowsLibraryManager _libraryManager;
 
         private readonly object _sync = new object();
 
         public bool UseLocalBackup { get; set; }
         public string BackupLocation { get; set; }
         public string SolutionDirectory { get; set; }
-
-        public string DebugToolsPath { get; set; }
 
         public GenericIndexerHost(ISourceIndexer indexer, TaskLoggingHelper logger)
         {
@@ -34,6 +34,8 @@ namespace PdbTasks.Indexer
             indexer.Host = this;
 
             UseLocalBackup = false;
+
+            _libraryManager = new DebuggingToolsForWindowsLibraryManager(logger);
         }
 
         public void IndexPdbFile(string sourcePath, string pdbPath)
@@ -115,18 +117,7 @@ namespace PdbTasks.Indexer
         {
             IList<string> result = new List<string>();
 
-//            _logger.LogMessage("Path: '{0}'", Path.Combine(DebugToolsPath, "srcsrv", "srctool.exe"));
-            var srctool = new System.Diagnostics.Process
-            {
-                StartInfo =
-                {
-                    FileName = Path.Combine(DebugToolsPath, "srcsrv", "srctool.exe"),
-                    Arguments = String.Format("\"{0}\" -r", pdbFile),
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
-            };
+            var srctool = _libraryManager.PrepareToRunTool(Path.Combine("srcsrv", "srctool.exe"), String.Format("\"{0}\" -r", pdbFile));
             srctool.Start();
             while (!srctool.StandardOutput.EndOfStream)
             {
@@ -224,18 +215,8 @@ namespace PdbTasks.Indexer
 
             if (success)
             {
-                var pdbstr = new System.Diagnostics.Process
-                    {
-                        StartInfo =
-                            {
-                                FileName = Path.Combine(DebugToolsPath, "srcsrv", "pdbstr.exe"),
-                                Arguments = String.Format("-w -p:\"{0}\" -s:srcsrv -i:\"{1}\"", pdbFile, tempFile),
-                                UseShellExecute = false,
-                                CreateNoWindow = true,
-                                RedirectStandardOutput = true,
-                                RedirectStandardError = true
-                            }
-                    };
+                var pdbstr = _libraryManager.PrepareToRunTool(Path.Combine("srcsrv", "pdbstr.exe"),
+                                          String.Format("-w -p:\"{0}\" -s:srcsrv -i:\"{1}\"", pdbFile, tempFile));
                 pdbstr.Start();
                 pdbstr.WaitForExit(); // TODO: check result code
 

@@ -7,6 +7,8 @@ namespace PdbTasks
 {
     public class PdbUploadToSymbolServer : Task
     {
+        private readonly DebuggingToolsForWindowsLibraryManager _libraryManager;
+
         /// <summary>
         /// Files to upload to symserver
         /// </summary>
@@ -20,20 +22,9 @@ namespace PdbTasks
         public string Version { get; set; }
         public string Comment { get; set; }
 
-        /// <summary>
-        /// Path to 'Debugging tools'
-        /// </summary>
-        public string DebugToolsPath { get; set; }
-
         public PdbUploadToSymbolServer()
         {
-            string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            if (programFiles.EndsWith("(x86)") && Environment.Is64BitOperatingSystem)
-            {
-                programFiles = programFiles.Substring(0, programFiles.Length - 6);
-            }
-            DebugToolsPath = Path.Combine(programFiles,
-                Environment.Is64BitOperatingSystem ? "Debugging Tools for Windows (x64)" : "Debugging Tools for Windows");
+            _libraryManager = new DebuggingToolsForWindowsLibraryManager(Log);
         }
 
         public override bool Execute()
@@ -56,20 +47,11 @@ namespace PdbTasks
                     File.Copy(task.ItemSpec, Path.Combine(tempDir, fileName));
                 }
             }
-
-            var symstore = new System.Diagnostics.Process
-            {
-                StartInfo =
-                {
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    FileName = Path.Combine(DebugToolsPath, "symstore.exe"),
-                    Arguments = String.Format("add /f \"{0}\\*.*\" /s \"{1}\" /t \"{2}\" /v \"{3}\" /c \"{4}\"",
-                                              tempDir, SymbolServer, ProductName, Version, Comment)
-                }
-            };
+                
+            const string symStoreTool = "symstore.exe";
+            string arguments = String.Format("add /f \"{0}\\*.*\" /s \"{1}\" /t \"{2}\" /v \"{3}\" /c \"{4}\"", tempDir, SymbolServer, ProductName, Version, Comment);
+            var symstore = _libraryManager.PrepareToRunTool(symStoreTool,
+                arguments);
 
             symstore.Start();
             symstore.WaitForExit();
@@ -78,7 +60,8 @@ namespace PdbTasks
             if (symstore.ExitCode != 0)
             {
                 string errorData = symstore.StandardError.ReadToEnd();
-                Log.LogError("Error: Unable to store PDB files\r\n{0}\r\n", errorData);
+                string outputData = symstore.StandardOutput.ReadToEnd();
+                Log.LogError("Error: Unable to store PDB files ({0} exit code is {1}):\r\n{2}\r\n{3}\r\nArguments were: {4}", symStoreTool, symstore.ExitCode, errorData, outputData, arguments);
                 result = false;
             }
             else
