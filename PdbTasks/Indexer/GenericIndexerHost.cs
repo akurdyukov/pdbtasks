@@ -14,7 +14,7 @@ namespace PdbTasks.Indexer
         private readonly FileCommands _fileCommands;
         private readonly List<string> _allowedArgs;
         private readonly List<LocalFile> _localFiles;
-        private readonly DebuggingToolsForWindows _debuggingToolsForWindows;
+        private readonly DebuggingToolsForWindowsLibraryManager _libraryManager;
 
         private readonly object _sync = new object();
 
@@ -35,7 +35,7 @@ namespace PdbTasks.Indexer
 
             UseLocalBackup = false;
 
-            _debuggingToolsForWindows = new DebuggingToolsForWindows(logger);
+            _libraryManager = new DebuggingToolsForWindowsLibraryManager(logger);
         }
 
         public void IndexPdbFile(string sourcePath, string pdbPath)
@@ -117,7 +117,7 @@ namespace PdbTasks.Indexer
         {
             IList<string> result = new List<string>();
 
-            var srctool = _debuggingToolsForWindows.PrepareToRunTool(Path.Combine("srcsrv", "srctool.exe"), String.Format("\"{0}\" -r", pdbFile));
+            var srctool = _libraryManager.PrepareToRunTool(Path.Combine("srcsrv", "srctool.exe"), String.Format("\"{0}\" -r", pdbFile));
             srctool.Start();
             while (!srctool.StandardOutput.EndOfStream)
             {
@@ -215,7 +215,7 @@ namespace PdbTasks.Indexer
 
             if (success)
             {
-                var pdbstr = _debuggingToolsForWindows.PrepareToRunTool(Path.Combine("srcsrv", "pdbstr.exe"),
+                var pdbstr = _libraryManager.PrepareToRunTool(Path.Combine("srcsrv", "pdbstr.exe"),
                                           String.Format("-w -p:\"{0}\" -s:srcsrv -i:\"{1}\"", pdbFile, tempFile));
                 pdbstr.Start();
                 pdbstr.WaitForExit(); // TODO: check result code

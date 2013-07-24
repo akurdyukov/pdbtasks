@@ -5,13 +5,13 @@ using Microsoft.Build.Utilities;
 
 namespace PdbTasks
 {
-    class DebuggingToolsForWindows
+    public class DebuggingToolsForWindowsLibraryManager
     {
+        private static readonly string debugToolsPath;
+
         private readonly TaskLoggingHelper logger;
 
-        private static string DebugToolsPath { get; set; }
-
-        static DebuggingToolsForWindows()
+        static DebuggingToolsForWindowsLibraryManager()
         {
             string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             if (programFiles.EndsWith("(x86)") && Environment.Is64BitOperatingSystem)
@@ -19,17 +19,17 @@ namespace PdbTasks
                 programFiles = programFiles.Substring(0, programFiles.Length - 6);
             }
             
-            DebugToolsPath = Path.Combine(programFiles, Environment.Is64BitOperatingSystem ? "Debugging Tools for Windows (x64)" : "Debugging Tools for Windows");
+            debugToolsPath = Path.Combine(programFiles, Environment.Is64BitOperatingSystem ? "Debugging Tools for Windows (x64)" : "Debugging Tools for Windows");
         }
 
-        public DebuggingToolsForWindows(TaskLoggingHelper logger)
+        public DebuggingToolsForWindowsLibraryManager(TaskLoggingHelper logger)
         {
             this.logger = logger;
         }
 
         public Process PrepareToRunTool(string toolRelativePath, string arguments)
         {
-            var toolFullPath = Path.Combine(DebugToolsPath, toolRelativePath);
+            var toolFullPath = Path.Combine(debugToolsPath, toolRelativePath);
             if (!File.Exists(toolFullPath))
             {
                 logger.LogError("Error: Unable to find '{0}'. Debugging Tools for Windows might not be installed", toolFullPath);

@@ -7,7 +7,7 @@ namespace PdbTasks
 {
     public class PdbUploadToSymbolServer : Task
     {
-        private readonly DebuggingToolsForWindows _debuggingToolsForWindows;
+        private readonly DebuggingToolsForWindowsLibraryManager _libraryManager;
 
         /// <summary>
         /// Files to upload to symserver
@@ -24,7 +24,7 @@ namespace PdbTasks
 
         public PdbUploadToSymbolServer()
         {
-            _debuggingToolsForWindows = new DebuggingToolsForWindows(Log);
+            _libraryManager = new DebuggingToolsForWindowsLibraryManager(Log);
         }
 
         public override bool Execute()
@@ -50,7 +50,7 @@ namespace PdbTasks
                 
             const string symStoreTool = "symstore.exe";
             string arguments = String.Format("add /f \"{0}\\*.*\" /s \"{1}\" /t \"{2}\" /v \"{3}\" /c \"{4}\"", tempDir, SymbolServer, ProductName, Version, Comment);
-            var symstore = _debuggingToolsForWindows.PrepareToRunTool(symStoreTool,
+            var symstore = _libraryManager.PrepareToRunTool(symStoreTool,
                 arguments);
 
             symstore.Start();
