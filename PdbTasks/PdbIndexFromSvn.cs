@@ -30,28 +30,12 @@ namespace PdbTasks
         /// </summary>
         public string Password { get; set; }
 
-        /// <summary>
-        /// Path to 'Debugging tools'
-        /// </summary>
-        public string DebugToolsPath { get; set; }
-
-        public PdbIndexFromSvn()
-        {
-            string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-            if (programFiles.EndsWith("(x86)") && Environment.Is64BitOperatingSystem)
-            {
-                programFiles = programFiles.Substring(0, programFiles.Length - 6);
-            }
-            DebugToolsPath = Path.Combine(programFiles, 
-                Environment.Is64BitOperatingSystem ? "Debugging Tools for Windows (x64)" : "Debugging Tools for Windows");
-        }
-
         public override bool Execute()
         {
             ISourceIndexer indexer = new Subversion();
             indexer.SetCredentials(UserName, Password);
 
-            var host = new GenericIndexerHost(indexer, Log) {DebugToolsPath = DebugToolsPath, UseLocalBackup = false};
+            var host = new GenericIndexerHost(indexer, Log) {UseLocalBackup = false};
 
             // index all files in path
             host.IndexPdbFile(SourceDirectory, SourcePdb.ItemSpec);
